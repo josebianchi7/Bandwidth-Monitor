@@ -14,18 +14,29 @@ with open('registered_devices.json', 'r') as f:
 usage_data = defaultdict(lambda: {'sent': 0, 'received': 0, 'start_time': None})
 
 # Function to send HTTP POST request when suspicious usage is detected
-def send_alert(device_ip, sent, received, alert_type="Bandwidth"):
+def send_alert(device_ip, sent, received, alert_type="Bandwidth", device_name="Unknown"):
     url = url_notify
-    name = devices[device_ip]['name']
-    message = {
-        "timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-        "eventDescription": f"Suspicious bandwidth usage detected for device, {name}, IP: {device_ip}. Sent: {sent}. Received: {received}."
-    }
+    if alert_type == "Bandwidth":
+        message = {
+            "timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            "eventDescription": f"Suspicious bandwidth usage detected for device, {device_name}, IP: {device_ip}. Sent: {sent}. Received: {received}."
+        }
+    elif alert_type == "Overuse":
+        message = {
+            "timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            "eventDescription": f"Overuse detected for device, {device_name}, IP: {device_ip}. Sent: {sent}. Received: {received}."
+        }
+    else:
+        message = {
+            "timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            "eventDescription": f"Check bandwidth usage for device, {device_name}, IP: {device_ip}. Sent: {sent}. Received: {received}."
+        }
     response = requests.post(url, json=message)
     if response.status_code == 200:
         print(f"Event alert sent.")
     else:
         print(f"Failed to send alert for IP: {ip}")
+
 
 # Function to track bandwidth usage
 def monitor_bandwidth():
@@ -79,7 +90,7 @@ def monitor_bandwidth():
                         current_time = datetime.now()
                         active_duration = (current_time - usage_data[ip]['start_time']).total_seconds()
                         if active_duration > max_active_time:
-                            send_alert(ip, usage_data[ip]['sent'], usage_data[ip]['received'], alert_type="Screen Time", device_name=device_name)
+                            send_alert(ip, usage_data[ip]['sent'], usage_data[ip]['received'], alert_type="Overuse", device_name=device_name)
 
         # Update initial stats for the next iteration
         initial_stats = current_stats
