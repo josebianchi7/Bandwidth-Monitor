@@ -35,7 +35,7 @@ def send_alert(device_ip, sent, received, alert_type="Bandwidth", device_name="U
     if response.status_code == 200:
         print(f"Event alert sent.")
     else:
-        print(f"Failed to send alert for IP: {ip}")
+        print(f"Failed to send alert for IP: {device_ip}")
 
 
 # Function to track bandwidth usage
