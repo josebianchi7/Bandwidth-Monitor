@@ -1,4 +1,5 @@
 /credentials.py
 __pycache__
 /registered_devices.py
-/registered_devices.json
+recorded_devices.json
+/usage_log.txt
